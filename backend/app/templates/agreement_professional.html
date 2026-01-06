@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title | default('Service Agreement') }}</title>
+</head>
+
+<body>
+    {% if watermark %}
+    <div class="watermark">{{ watermark }}</div>
+    {% endif %}
+
+    <div class="header">
+        <table style="width: 100%; border: none;">
+            <tr>
+                <td style="width: 50%; vertical-align: middle; border: none;">
+                    {% if assets and assets.logo %}
+                    <img src="{{ assets.logo.data_url }}" alt="Company Logo" class="logo">
+                    {% endif %}
+                </td>
+                <td style="width: 50%; text-align: right; vertical-align: middle; border: none;">
+                    <h1 style="margin: 0; color: {{ branding.primary_color }};">SERVICE AGREEMENT</h1>
+                    <p style="margin: 0.5rem 0; font-size: 11pt; color: #64748B;">
+                        Agreement #{{ agreement_number | default('N/A') }}
+                    </p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="highlight" style="margin: 2rem 0;">
+        <table style="width: 100%; border: none;">
+            <tr>
+                <td style="width: 50%; border: none;">
+                    <p style="margin: 0;"><strong>Agreement Date:</strong> {{ agreement_date | format_date }}</p>
+                    {% if effective_date %}
+                    <p style="margin: 0.5rem 0;"><strong>Effective Date:</strong> {{ effective_date | format_date }}</p>
+                    {% endif %}
+                </td>
+                <td style="width: 50%; text-align: right; border: none;">
+                    {% if expiry_date %}
+                    <p style="margin: 0;"><strong>Expiry Date:</strong> {{ expiry_date | format_date }}</p>
+                    {% endif %}
+                    {% if version %}
+                    <p style="margin: 0.5rem 0;"><strong>Version:</strong> {{ version }}</p>
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div style="margin: 2rem 0;">
+        <h2 style="border-bottom: 2px solid {{ branding.primary_color }}; padding-bottom: 0.5rem;">Parties</h2>
+
+        <div style="margin: 1.5rem 0;">
+            <h3 style="color: {{ branding.secondary_color }};">Provider:</h3>
+            <p style="margin: 0.25rem 0;"><strong>{{ provider_name }}</strong></p>
+            {% if provider_address %}
+            <p style="margin: 0.25rem 0;">{{ provider_address }}</p>
+            {% endif %}
+            {% if provider_registration %}
+            <p style="margin: 0.25rem 0;">Registration: {{ provider_registration }}</p>
+            {% endif %}
+            {% if provider_contact %}
+            <p style="margin: 0.25rem 0;">Contact: {{ provider_contact }}</p>
+            {% endif %}
+        </div>
+
+        <div style="margin: 1.5rem 0;">
+            <h3 style="color: {{ branding.secondary_color }};">Client:</h3>
+            <p style="margin: 0.25rem 0;"><strong>{{ client_name }}</strong></p>
+            {% if client_company %}
+            <p style="margin: 0.25rem 0;">{{ client_company }}</p>
+            {% endif %}
+            {% if client_address %}
+            <p style="margin: 0.25rem 0;">{{ client_address }}</p>
+            {% endif %}
+            {% if client_contact %}
+            <p style="margin: 0.25rem 0;">Contact: {{ client_contact }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div style="margin: 2rem 0;">
+        <h2 style="border-bottom: 2px solid {{ branding.primary_color }}; padding-bottom: 0.5rem;">1. Scope of Services
+        </h2>
+        <p style="text-align: justify;">{{ scope_of_services | default('The Provider agrees to deliver the services as
+            outlined in the attached schedule or as mutually agreed upon by both parties.') }}</p>
+
+        {% if deliverables %}
+        <h4>Deliverables:</h4>
+        <ul style="line-height: 1.8;">
+            {% for deliverable in deliverables %}
+            <li>{{ deliverable }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+
+    <div style="margin: 2rem 0;">
+        <h2 style="border-bottom: 2px solid {{ branding.primary_color }}; padding-bottom: 0.5rem;">2. Payment Terms</h2>
+        <p style="text-align: justify;">
+            {{ payment_terms | default('The Client agrees to pay the Provider according to the payment schedule defined
+            below.') }}
+        </p>
+
+        {% if payment_schedule %}
+        <table style="margin-top: 1rem;">
+            <thead>
+                <tr>
+                    <th>Milestone</th>
+                    <th style="text-align: center;">Due Date</th>
+                    <th style="text-align: right;">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payment in payment_schedule %}
+                <tr>
+                    <td>{{ payment.milestone }}</td>
+                    <td style="text-align: center;">{{ payment.due_date | format_date }}</td>
+                    <td style="text-align: right;">{{ payment.amount | format_currency(currency | default('USD')) }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr class="total-row">
+                    <td colspan="2"><strong>Total Contract Value:</strong></td>
+                    <td style="text-align: right;"><strong>{{ total_amount | format_currency(currency | default('USD'))
+                            }}</strong></td>
+                </tr>
+            </tfoot>
+        </table>
+        {% endif %}
+    </div>
+
+    <div style="margin: 2rem 0;">
+        <h2 style="border-bottom: 2px solid {{ branding.primary_color }}; padding-bottom: 0.5rem;">3. Term and
+            Termination</h2>
+        <p style="text-align: justify;">
+            {{ term_and_termination | default('This Agreement shall commence on the Effective Date and continue for the
+            duration specified, unless terminated earlier in accordance with the termination clauses herein.') }}
+        </p>
+    </div>
+
+    <div style="margin: 2rem 0;">
+        <h2 style="border-bottom: 2px solid {{ branding.primary_color }}; padding-bottom: 0.5rem;">4. Confidentiality
+        </h2>
+        <p style="text-align: justify;">
+            {{ confidentiality | default('Both parties agree to maintain the confidentiality of any proprietary or
+            confidential information disclosed during the term of this Agreement.') }}
+        </p>
+    </div>
+
+    <div style="margin: 2rem 0;">
+        <h2 style="border-bottom: 2px solid {{ branding.primary_color }}; padding-bottom: 0.5rem;">5. Intellectual
+            Property</h2>
+        <p style="text-align: justify;">
+            {{ intellectual_property | default('All intellectual property rights in deliverables shall be governed as
+            per the terms mutually agreed upon by both parties.') }}
+        </p>
+    </div>
+
+    {% if additional_clauses %}
+    {% for clause in additional_clauses %}
+    <div style="margin: 2rem 0;">
+        <h2 style="border-bottom: 2px solid {{ branding.primary_color }}; padding-bottom: 0.5rem;">{{ loop.index + 5 }}.
+            {{ clause.title }}</h2>
+        <p style="text-align: justify;">{{ clause.content }}</p>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <div style="margin: 3rem 0 2rem 0; page-break-inside: avoid;">
+        <h2 style="border-bottom: 2px solid {{ branding.primary_color }}; padding-bottom: 0.5rem;">Signatures</h2>
+
+        <table style="width: 100%; margin-top: 2rem; border: none;">
+            <tr>
+                <td style="width: 50%; vertical-align: bottom; border: none;">
+                    <div style="margin- bottom: 3rem;">
+                        {% if assets and assets.signature_provider %}
+                        <img src="{{ assets.signature_provider.data_url }}" alt="Provider Signature"
+                            style="max-width: 200px; height: auto;">
+                        {% else %}
+                        <div style="border-bottom: 1px solid #000; width: 200px; height: 50px;"></div>
+                        {% endif %}
+                    </div>
+                    <p style="margin: 0.5rem 0;"><strong>{{ provider_name }}</strong></p>
+                    <p style="margin: 0; color: #64748B;">Provider</p>
+                    <p style="margin: 0; color: #64748B;">Date: {{ signature_date_provider | format_date if
+                        signature_date_provider else '_____________' }}</p>
+                </td>
+                <td style="width: 50%; vertical-align: bottom; text-align: right; border: none;">
+                    <div style="margin-bottom: 3rem; float: right;">
+                        {% if assets and assets.signature_client %}
+                        <img src="{{ assets.signature_client.data_url }}" alt="Client Signature"
+                            style="max-width: 200px; height: auto;">
+                        {% else %}
+                        <div style="border-bottom: 1px solid #000; width: 200px; height: 50px;"></div>
+                        {% endif %}
+                    </div>
+                    <div style="clear: both;"></div>
+                    <p style="margin: 0.5rem 0;"><strong>{{ client_name }}</strong></p>
+                    <p style="margin: 0; color: #64748B;">Client</p>
+                    <p style="margin: 0; color: #64748B;">Date: {{ signature_date_client | format_date if
+                        signature_date_client else '_____________' }}</p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    {% if qr_code %}
+    <div style="margin-top: 2rem; text-align: center;">
+        <img src="{{ qr_code }}" alt="Verification QR Code" class="qr-code">
+        <p style="font-size: 8pt; color: #64748B; margin-top: 0.5rem;">Scan to verify document authenticity</p>
+    </div>
+    {% endif %}
+
+    <div class="footer">
+        <p style="text-align: center; font-size: 9pt; color: #64748B;">
+            This agreement is governed by the laws of {{ jurisdiction | default('[Jurisdiction]') }}.
+        </p>
+        {% if company_name %}
+        <p style="text-align: center; font-size: 9pt; color: #64748B; margin-top: 0.5rem;">
+            {{ company_name }} | {{ company_email | default('') }} | {{ company_website | default('') }}
+        </p>
+        {% endif %}
+    </div>
+</body>
+
+</html>

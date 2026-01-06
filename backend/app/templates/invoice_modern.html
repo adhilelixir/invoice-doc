@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title | default('Invoice') }}</title>
+</head>
+
+<body>
+    {% if watermark %}
+    <div class="watermark">{{ watermark }}</div>
+    {% endif %}
+
+    <div class="header">
+        <table style="width: 100%; border: none;">
+            <tr>
+                <td style="width: 50%; vertical-align: top; border: none;">
+                    {% if assets and assets.logo %}
+                    <img src="{{ assets.logo.data_url }}" alt="Company Logo" class="logo">
+                    {% endif %}
+                </td>
+                <td style="width: 50%; text-align: right; vertical-align: top; border: none;">
+                    <h1 style="margin: 0; color: {{ branding.primary_color }};">INVOICE</h1>
+                    <p style="margin: 0.5rem 0; font-size: 12pt; color: #64748B;">
+                        #{{ invoice_number }}
+                    </p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div style="margin: 2rem 0;">
+        <table style="width: 100%; border: none;">
+            <tr>
+                <td style="width: 50%; vertical-align: top; border: none;">
+                    <h3 style="margin-top: 0;">Bill To:</h3>
+                    <p style="margin: 0.25rem 0;"><strong>{{ customer_name }}</strong></p>
+                    {% if customer_company %}
+                    <p style="margin: 0.25rem 0;">{{ customer_company }}</p>
+                    {% endif %}
+                    {% if customer_address %}
+                    <p style="margin: 0.25rem 0;">{{ customer_address }}</p>
+                    {% endif %}
+                    {% if customer_email %}
+                    <p style="margin: 0.25rem 0;">{{ customer_email }}</p>
+                    {% endif %}
+                    {% if customer_vat %}
+                    <p style="margin: 0.25rem 0;">VAT: {{ customer_vat }}</p>
+                    {% endif %}
+                </td>
+                <td style="width: 50%; text-align: right; vertical-align: top; border: none;">
+                    <h3 style="margin-top: 0;">Invoice Details:</h3>
+                    <table style="width: 100%; text-align: right; border: none;">
+                        <tr>
+                            <td style="padding: 0.25rem 0; border: none;"><strong>Issue Date:</strong></td>
+                            <td style="padding: 0.25rem 0; border: none;">{{ issue_date | format_date }}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.25rem 0; border: none;"><strong>Due Date:</strong></td>
+                            <td style="padding: 0.25rem 0; border: none;">{{ due_date | format_date }}</td>
+                        </tr>
+                        {% if purchase_order %}
+                        <tr>
+                            <td style="padding: 0.25rem 0; border: none;"><strong>PO Number:</strong></td>
+                            <td style="padding: 0.25rem 0; border: none;">{{ purchase_order }}</td>
+                        </tr>
+                        {% endif %}
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="mt-4">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 10%;">#</th>
+                    <th style="width: 40%;">Description</th>
+                    <th style="width: 15%; text-align: center;">Quantity</th>
+                    <th style="width: 17.5%; text-align: right;">Unit Price</th>
+                    <th style="width: 17.5%; text-align: right;">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>
+                        <strong>{{ item.name }}</strong>
+                        {% if item.description %}
+                        <br><span style="font-size: 9pt; color: #64748B;">{{ item.description }}</span>
+                        {% endif %}
+                    </td>
+                    <td style="text-align: center;">{{ item.quantity }}</td>
+                    <td style="text-align: right;">{{ item.unit_price | format_currency(currency | default('USD')) }}
+                    </td>
+                    <td style="text-align: right;">{{ (item.quantity * item.unit_price) | format_currency(currency |
+                        default('USD')) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div style="margin-top: 2rem;">
+        <table style="width: 100%; border: none;">
+            <tr>
+                <td style="width: 60%; vertical-align: top; border: none;">
+                    {% if notes %}
+                    <div class="highlight">
+                        <h4 style="margin-top: 0;">Notes:</h4>
+                        <p style="margin: 0;">{{ notes }}</p>
+                    </div>
+                    {% endif %}
+
+                    {% if qr_code %}
+                    <div style="margin-top: 1rem;">
+                        <img src="{{ qr_code }}" alt="QR Code" class="qr-code">
+                        <p style="font-size: 8pt; color: #64748B; margin-top: 0.5rem;">Scan to verify</p>
+                    </div>
+                    {% endif %}
+                </td>
+                <td style="width: 40%; vertical-align: top; border: none;">
+                    <table style="width: 100%; border: none; font-size: 11pt;">
+                        <tr>
+                            <td style="padding: 0.5rem 0; border: none;"><strong>Subtotal:</strong></td>
+                            <td style="text-align: right; padding: 0.5rem 0; border: none;">
+                                {{ subtotal | format_currency(currency | default('USD')) }}
+                            </td>
+                        </tr>
+                        {% if discount %}
+                        <tr>
+                            <td style="padding: 0.5rem 0; border: none;">Discount ({{ discount_rate }}%):</td>
+                            <td style="text-align: right; padding: 0.5rem 0; border: none; color: #10B981;">
+                                -{{ discount | format_currency(currency | default('USD')) }}
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% if tax_rate %}
+                        <tr>
+                            <td style="padding: 0.5rem 0; border: none;">Tax ({{ tax_rate }}%):</td>
+                            <td style="text-align: right; padding: 0.5rem 0; border: none;">
+                                {{ tax_amount | format_currency(currency | default('USD')) }}
+                            </td>
+                        </tr>
+                        {% endif %}
+                        <tr class="total-row">
+                            <td
+                                style="padding: 0.75rem 0; border-top: 2px solid {{ branding.primary_color }}; border-bottom: 2px solid {{ branding.primary_color }};">
+                                <strong>TOTAL:</strong></td>
+                            <td
+                                style="text-align: right; padding: 0.75rem 0; border-top: 2px solid {{ branding.primary_color }}; border-bottom: 2px solid {{ branding.primary_color }}; color: {{ branding.primary_color }};">
+                                <strong>{{ total_amount | format_currency(currency | default('USD')) }}</strong>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    {% if payment_terms or payment_methods %}
+    <div class="mt-4 highlight">
+        {% if payment_terms %}
+        <h4 style="margin-top: 0;">Payment Terms:</h4>
+        <p style="margin: 0 0 1rem 0;">{{ payment_terms }}</p>
+        {% endif %}
+
+        {% if payment_methods %}
+        <h4 style="margin-top: 0;">Payment Methods:</h4>
+        <p style="margin: 0;">{{ payment_methods }}</p>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="footer">
+        <table style="width: 100%; border: none;">
+            <tr>
+                <td style="width: 33%; vertical-align: top; border: none; font-size: 9pt;">
+                    {% if company_name %}
+                    <strong>{{ company_name }}</strong><br>
+                    {% endif %}
+                    {% if company_address %}
+                    {{ company_address }}<br>
+                    {% endif %}
+                    {% if company_registration %}
+                    Reg: {{ company_registration }}
+                    {% endif %}
+                </td>
+                <td style="width: 33%; text-align: center; vertical-align: top; border: none; font-size: 9pt;">
+                    {% if company_email %}
+                    Email: {{ company_email }}<br>
+                    {% endif %}
+                    {% if company_phone %}
+                    Phone: {{ company_phone }}
+                    {% endif %}
+                </td>
+                <td style="width: 33%; text-align: right; vertical-align: top; border: none; font-size: 9pt;">
+                    {% if company_website %}
+                    {{ company_website }}<br>
+                    {% endif %}
+                    {% if company_tax_id %}
+                    Tax ID: {{ company_tax_id }}
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+
+</html>
